@@ -1,0 +1,6 @@
+/bench/bench
+/examples/http-ingest/http-ingest
+*.exe
+*.test
+*.out
+testdata/fuzz/
