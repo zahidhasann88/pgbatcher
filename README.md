@@ -1,5 +1,7 @@
 # pgbatcher
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/zahidhasann88/pgbatcher.svg)](https://pkg.go.dev/github.com/zahidhasann88/pgbatcher) [![CI](https://github.com/zahidhasann88/pgbatcher/actions/workflows/ci.yml/badge.svg)](https://github.com/zahidhasann88/pgbatcher/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 pgbatcher merges concurrent single-row PostgreSQL `INSERT`s into one multi-row `INSERT`.
 Each caller still gets its own result or error. Batching is opt-in per call, and all other SQL runs unchanged.
 
@@ -93,7 +95,4 @@ Zero or negative values are ignored and the default is kept.
 - [docs/BENCHMARKS.md](docs/BENCHMARKS.md): benchmark setup and full results (`go run ./bench`).
 - [examples/http-ingest](examples/http-ingest): HTTP service with Docker Compose and a load script.
 - Tests: `go test -race ./...`. Set `PG_BATCHER_TEST_DSN` to run the PostgreSQL integration tests.
-
-## License
-
-[MIT](LICENSE)
+- [CHANGELOG.md](CHANGELOG.md) and [MIT License](LICENSE).

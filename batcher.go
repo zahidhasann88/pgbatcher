@@ -16,6 +16,8 @@ import (
 type Execer interface {
 	ExecContext(context.Context, string, ...any) (sql.Result, error)
 }
+
+// Batcher queues opted-in INSERTs and flushes them as multi-row statements. It is safe for concurrent use.
 type Batcher struct {
 	db              Execer
 	cfg             config
@@ -76,6 +78,9 @@ func (b *Batcher) flushIfQueued(key string, g *pendingGroup) {
 	defer b.active.Done()
 	b.flush(g)
 }
+
+// ExecContext runs q like sql.DB.ExecContext. It is batched only when ctx comes from WithBatch
+// and q is a supported single-row INSERT; otherwise it runs directly on the underlying db.
 func (b *Batcher) ExecContext(ctx context.Context, q string, args ...any) (sql.Result, error) {
 	return b.execOn(ctx, b.db, false, q, args...)
 }

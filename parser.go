@@ -1,4 +1,3 @@
-// Package pgbatcher coalesces explicitly opted-in single-row PostgreSQL INSERTs.
 package pgbatcher
 
 import (

@@ -1,18 +1,30 @@
 # Changelog
 
-## Unreleased
+All notable changes to this project are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
-- Initial Go 1.22+ MVP: conservative INSERT parser, explicit opt-in queue, time/size/byte flushes, multi-VALUES rewrite, recursive failure isolation, database/sql helper and connector wrapper, metrics, local-PostgreSQL integration tests, example service, and benchmark harness.
-- Keyed SELECT batching, typed-array `unnest`, `RETURNING`, `ON CONFLICT`, and SQL hint opt-in are not implemented; see `docs/DESIGN.md`.
+## [Unreleased]
 
-### Fixed
+## [0.1.0] - 2026-10-28
 
-- Batched INSERTs were rewritten as malformed SQL (`VALUES (($1,$2),...`), so every batch failed and fell back to one statement per row. Batches now execute as a single multi-row INSERT.
-- With `Wrap`, a caller cancelled mid-flush could return while the batch was still running on its connection, letting `database/sql` reuse that connection concurrently.
+First release.
 
-### Changed
+### Added
 
-- Module path is `github.com/zahidhasann88/pgbatcher`.
-- `ParseInsert` is now unexported; it returned an unexported type.
-- Window flushes use one timer per pending group instead of a background ticker that ran every `window/10`.
-- `go run ./bench` supports `-runs`, `-workers`, `-duration`, `-window`, `-size`, and `-maxconns`, and reports errors, average batch size, and Postgres CPU.
+- `New`, `Batcher.ExecContext`, and `Close`: batch opted-in single-row INSERTs through a `*sql.DB`.
+- `Wrap`: batch at the `database/sql` driver level; statements inside transactions are never batched.
+- `WithBatch` per-call opt-in, and the `WithWindow`, `WithBatchSize`, `WithMaxBytes`, and `WithMetrics` options.
+- Conservative SQL tokenizer that batches only `INSERT INTO t (cols) VALUES ($1, ...)`; everything else passes through.
+- Multi-row `VALUES` rewrite, grouped by statement shape, flushed by time window, batch size, or byte limit.
+- Error isolation: failed batches are split and retried so only the failing caller gets the error.
+- Per-caller context cancellation, and `Metrics` interface with an atomic `Counters` implementation.
+- Benchmark harness (`go run ./bench`), HTTP ingest example with Docker Compose, and CI.
+
+### Known limitations
+
+- Keyed SELECT batching, typed-array `unnest`, and batched `RETURNING` / `ON CONFLICT` are not implemented.
+- The `/*+ batch */` SQL hint is not supported; use `WithBatch`.
+- See [docs/DESIGN.md](docs/DESIGN.md) for details.
+
+[Unreleased]: https://github.com/zahidhasann88/pgbatcher/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/zahidhasann88/pgbatcher/releases/tag/v0.1.0

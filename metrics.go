@@ -11,6 +11,8 @@ type Metrics interface {
 	Fallback()
 	Error()
 }
+
+// Counters is a Metrics implementation backed by atomic counters.
 type Counters struct {
 	Batches   atomic.Uint64
 	Rows      atomic.Uint64
